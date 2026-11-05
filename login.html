@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - ResearchAI</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+
+<header class="navbar">
+    <a class="logo" href="/">ResearchAI</a>
+    <nav><a href="/">Home</a><a href="/register">Register</a></nav>
+</header>
+
+<main class="auth-wrapper">
+    <div class="auth-card">
+        <h1>Welcome Back!</h1>
+        <p>Login to your ResearchAI account.</p>
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% for category, message in messages %}
+                <div class="message {{ category }}">{{ message }}</div>
+            {% endfor %}
+        {% endwith %}
+
+        <form method="POST">
+            <label>Email Address</label>
+            <input type="email" name="email" placeholder="Enter your email" required>
+
+            <label>Password</label>
+            <input type="password" name="password" placeholder="Enter your password" required>
+
+            <div class="forgot-link">
+                <a href="/forgot-password">Forgot Password?</a>
+            </div>
+
+            <button type="submit" class="primary-button full-button">Login</button>
+        </form>
+
+        <p class="auth-bottom">
+            Don't have an account? <a href="/register">Register</a>
+        </p>
+    </div>
+</main>
+
+</body>
+</html>

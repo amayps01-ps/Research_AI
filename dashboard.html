@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - ResearchAI</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+
+<header class="navbar">
+    <a class="logo" href="/dashboard">ResearchAI</a>
+    <nav>
+        <span class="welcome">Hello, {{ session.get('user_name') }}</span>
+        <a href="/logout">Logout</a>
+    </nav>
+</header>
+
+<main class="dashboard">
+    <section class="dashboard-heading">
+        <span class="tagline">YOUR RESEARCH SPACE</span>
+        <h1>Research Dashboard</h1>
+        <p>Search a topic and discover related research papers using AI.</p>
+    </section>
+
+    <div class="stats-card">
+        <h2>{{ papers_count }}</h2>
+        <p>Sample research topics available</p>
+    </div>
+
+    <section class="search-section">
+        <h2>Find Research Papers</h2>
+        <form method="POST" class="search-form">
+            <input
+                type="text"
+                name="query"
+                placeholder="Example: Machine learning in healthcare"
+                value="{{ query }}"
+                required>
+            <button type="submit" class="primary-button">Search</button>
+        </form>
+    </section>
+
+    {% if query %}
+        <h2 class="results-title">Results for "{{ query }}"</h2>
+
+        {% if results %}
+            <div class="results-grid">
+                {% for paper in results %}
+                    <article class="paper-card">
+                        <span class="paper-year">{{ paper.year }}</span>
+                        <h3>{{ paper.title }}</h3>
+                        <p>{{ paper.abstract }}</p>
+                        <p class="similarity">
+                            AI similarity: {{ paper.score }}%
+                        </p>
+                        <a href="{{ paper.url }}" target="_blank" rel="noopener noreferrer">
+                            Explore Paper →
+                        </a>
+                    </article>
+                {% endfor %}
+            </div>
+        {% else %}
+            <p>No matching sample papers found. Try different keywords.</p>
+        {% endif %}
+    {% endif %}
+</main>
+
+<footer>
+    © 2026 ResearchAI | AI Research Paper Recommendation System
+</footer>
+
+</body>
+</html>

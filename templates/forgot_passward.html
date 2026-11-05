@@ -7,41 +7,21 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
-
-<header class="navbar">
-    <a class="logo" href="/">ResearchAI</a>
-    <nav>
-        <a href="/">Home</a>
-        <a href="/login">Login</a>
-    </nav>
-</header>
-
-<main class="auth-wrapper">
-    <div class="auth-card">
-        <h1>Forgot Password?</h1>
+    <div class="container">
+        <h2>Forgot Password?</h2>
         <p>Enter your registered email address.</p>
 
-        {% with messages = get_flashed_messages(with_categories=true) %}
-            {% for category, message in messages %}
-                <div class="message {{ category }}">{{ message }}</div>
-            {% endfor %}
-        {% endwith %}
-
         <form method="POST">
-            <label>Email Address</label>
-            <input type="email" name="email"
-                   placeholder="Enter your email" required>
-
-            <button type="submit" class="primary-button full-button">
-                Generate Reset Link
-            </button>
+            <input
+                type="email"
+                name="email"
+                placeholder="Enter your email"
+                required
+            >
+            <button type="submit">Submit</button>
         </form>
 
-        <p class="auth-bottom">
-            <a href="/login">Back to Login</a>
-        </p>
+        <p><a href="{{ url_for('login') }}">Back to Login</a></p>
     </div>
-</main>
-
 </body>
 </html>

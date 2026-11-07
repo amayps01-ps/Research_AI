@@ -1,0 +1,12 @@
+PythonAnywhere WSGI configuration example.
+Change YOUR_USERNAME and the project directory if needed.
+
+import sys
+project_home = '/home/YOUR_USERNAME/ResearchAI_Free_Hosting'
+if project_home not in sys.path:
+    sys.path.insert(0, project_home)
+
+from app import app as application
+
+Set your virtualenv separately in the PythonAnywhere Web tab:
+ /home/YOUR_USERNAME/.virtualenvs/researchai

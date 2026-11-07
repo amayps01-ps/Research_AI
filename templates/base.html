@@ -1,38 +1,247 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="theme-color" content="#AFDDE5">
-  <title>{% block title %}ResearchAI{% endblock %}</title>
-  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#AFDDE5">
+
+    <title>{% block title %}ResearchAI{% endblock %}</title>
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background: #f3f9fc;
+            color: #102f46;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .navbar {
+            width: 100%;
+            min-height: 85px;
+            padding: 15px 5%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: white;
+            box-shadow: 0 3px 15px rgba(0,0,0,0.07);
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .brand {
+            font-size: 30px;
+            font-weight: bold;
+            color: #073b50;
+            text-decoration: none;
+        }
+
+        .brand span {
+            color: #0799ae;
+        }
+
+        .brand small {
+            display: block;
+            font-size: 12px;
+            font-weight: normal;
+            letter-spacing: 1px;
+            color: #55717e;
+        }
+
+        nav {
+            display: flex;
+            align-items: center;
+            gap: 25px;
+            flex-wrap: wrap;
+        }
+
+        nav a {
+            color: #15394c;
+            text-decoration: none;
+            font-size: 15px;
+            font-weight: 600;
+            transition: 0.3s;
+        }
+
+        nav a:hover {
+            color: #009caf;
+        }
+
+        nav .nav-cta {
+            background: #087f96;
+            color: white;
+            padding: 12px 23px;
+            border-radius: 10px;
+        }
+
+        nav .nav-cta:hover {
+            background: #055b70;
+            color: white;
+        }
+
+        .hero-banner {
+            min-height: 230px;
+            padding: 45px 20px;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            background: linear-gradient(120deg, #06364e, #087d96, #06364e);
+            color: white;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero-banner h1 {
+            font-size: clamp(32px, 5vw, 55px);
+            margin-bottom: 12px;
+            letter-spacing: 1px;
+        }
+
+        .hero-banner h1 span {
+            color: #8df2f3;
+        }
+
+        .hero-banner p {
+            font-size: clamp(15px, 2vw, 21px);
+            color: #e1fbff;
+        }
+
+        .page {
+            width: 100%;
+            max-width: 1250px;
+            margin: 0 auto;
+            padding: 35px 22px;
+            flex: 1;
+        }
+
+        .flash-wrap {
+            margin-bottom: 20px;
+        }
+
+        .flash {
+            padding: 13px 17px;
+            margin-bottom: 10px;
+            border-radius: 9px;
+            background: #dff7e8;
+            color: #17613b;
+        }
+
+        .flash.error,
+        .flash.danger {
+            background: #ffe5e5;
+            color: #a32323;
+        }
+
+        .flash.warning {
+            background: #fff2d5;
+            color: #805600;
+        }
+
+        .flash.info {
+            background: #e1f3ff;
+            color: #14527a;
+        }
+
+        footer {
+            background: #052f45;
+            color: #e8faff;
+            text-align: center;
+            padding: 28px 15px;
+            font-size: 14px;
+            line-height: 1.8;
+        }
+
+        footer strong {
+            color: #8df2f3;
+        }
+
+        @media (max-width: 700px) {
+            .navbar {
+                justify-content: center;
+                text-align: center;
+            }
+
+            nav {
+                justify-content: center;
+                gap: 15px;
+            }
+
+            .brand {
+                font-size: 27px;
+            }
+
+            .hero-banner {
+                min-height: 190px;
+                padding: 35px 15px;
+            }
+
+            .page {
+                padding: 22px 14px;
+            }
+        }
+    </style>
 </head>
+
 <body>
+
 <header class="navbar">
-  <a class="brand" href="{{ url_for('index') }}">Research<span>AI</span></a>
-  <nav>
-    <a href="{{ url_for('index') }}">Home</a>
-    {% if session.get('user_id') %}
-      <a href="{{ url_for('dashboard') }}">Dashboard</a>
-      <a href="{{ url_for('logout') }}">Logout</a>
-    {% else %}
-      <a href="{{ url_for('login') }}">Login</a>
-      <a class="nav-cta" href="{{ url_for('register') }}">Register</a>
-    {% endif %}
-  </nav>
+    <a class="brand" href="{{ url_for('index') }}">
+        Research<span>AI</span>
+        <small>Discover. Explore. Innovate.</small>
+    </a>
+
+    <nav>
+        <a href="{{ url_for('index') }}">⌂ Home</a>
+
+        {% if session.get('user_id') %}
+            <a href="{{ url_for('dashboard') }}">▦ Dashboard</a>
+            <a href="{{ url_for('logout') }}">Logout</a>
+        {% else %}
+            <a href="{{ url_for('login') }}">Login</a>
+            <a class="nav-cta" href="{{ url_for('register') }}">Register</a>
+        {% endif %}
+    </nav>
 </header>
+
+<section class="hero-banner">
+    <h1>Research<span>AI</span></h1>
+    <p>Discover. Explore. Innovate.</p>
+    <p>Your AI-powered research companion</p>
+</section>
+
 <main class="page">
-  {% with messages = get_flashed_messages(with_categories=true) %}
-    {% if messages %}
-      <div class="flash-wrap">
-      {% for category, message in messages %}
-        <div class="flash {{ category }}">{{ message }}</div>
-      {% endfor %}
-      </div>
-    {% endif %}
-  {% endwith %}
-  {% block content %}{% endblock %}
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            <div class="flash-wrap">
+                {% for category, message in messages %}
+                    <div class="flash {{ category }}">{{ message }}</div>
+                {% endfor %}
+            </div>
+        {% endif %}
+    {% endwith %}
+
+    {% block content %}{% endblock %}
+
 </main>
-<footer>© {{ 2026 }} ResearchAI · AI Research Paper Recommendation System</footer>
+
+<footer>
+    <strong>ResearchAI</strong> · Discover. Explore. Innovate.
+    <br>
+    AI Research Paper Recommendation System
+    <br>
+    © 2026 ResearchAI. All rights reserved.
+</footer>
+
 </body>
 </html>

@@ -1,68 +1,325 @@
 {% extends "base.html" %}
 
+{% block title %}ResearchAI – Dashboard{% endblock %}
+
 {% block content %}
 
-<div style="max-width:900px; margin:30px auto; padding:20px;">
+<style>
+    .ra-dashboard {
+        max-width: 1050px;
+        margin: 10px auto;
+    }
 
-    <div style="display:flex; justify-content:space-between; align-items:center;">
-        <h1>ResearchAI</h1>
-        <a href="{{ url_for('logout') }}">Logout</a>
-    </div>
+    .ra-welcome {
+        padding: 35px;
+        border-radius: 22px;
+        background: linear-gradient(120deg, #092C4C, #087FAD);
+        color: white;
+        margin-bottom: 28px;
+        box-shadow: 0 12px 30px #092c4c20;
+    }
 
-    <h2>Welcome to ResearchAI</h2>
+    .ra-welcome h1 {
+        font-size: clamp(27px, 4vw, 38px);
+        margin: 0 0 8px;
+    }
 
-    <p>Find research papers based on your interests.</p>
+    .ra-welcome p {
+        color: #D9F3FA;
+        margin: 0;
+    }
 
-    <form method="POST" action="{{ url_for('dashboard') }}"
-          style="margin:25px 0; display:flex; gap:10px; flex-wrap:wrap;">
+    .ra-label {
+        color: #65E5D3;
+        font-size: 12px;
+        font-weight: 800;
+        letter-spacing: 2px;
+    }
 
-        <input
-            type="text"
-            name="query"
-            value="{{ query }}"
-            placeholder="Enter research topic..."
-            required
-            style="flex:1; min-width:200px; padding:14px; border:1px solid #999; border-radius:8px;"
-        >
+    .ra-search-section {
+        background: white;
+        border: 1px solid #D8E8F1;
+        border-radius: 20px;
+        padding: 25px;
+        margin-bottom: 28px;
+        box-shadow: 0 8px 25px #092c4c08;
+    }
 
-        <button type="submit"
-                style="padding:14px 25px; background:#AFDDE5; border:0; border-radius:8px; cursor:pointer;">
-            Search Papers
-        </button>
-    </form>
+    .ra-search-section h2 {
+        margin-top: 0;
+        color: #092C4C;
+    }
+
+    .ra-search-form {
+        display: flex;
+        gap: 12px;
+        margin-top: 18px;
+    }
+
+    .ra-search-form input {
+        flex: 1;
+        min-width: 0;
+        padding: 15px;
+        border: 1px solid #C6DCE9;
+        border-radius: 11px;
+        font-size: 15px;
+        outline: none;
+    }
+
+    .ra-search-form input:focus {
+        border-color: #087FAD;
+        box-shadow: 0 0 0 3px #087FAD22;
+    }
+
+    .ra-search-form button {
+        background: #087FAD;
+        color: white;
+        border: 0;
+        padding: 14px 23px;
+        border-radius: 11px;
+        font-weight: bold;
+        cursor: pointer;
+        transition: .2s;
+    }
+
+    .ra-search-form button:hover {
+        background: #092C4C;
+        transform: translateY(-2px);
+    }
+
+    .ra-topics {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 9px;
+        margin-top: 18px;
+    }
+
+    .ra-topic {
+        background: #EAF7FC;
+        color: #087FAD;
+        padding: 7px 13px;
+        border-radius: 30px;
+        font-size: 12px;
+        font-weight: 700;
+    }
+
+    .ra-results-title {
+        margin: 28px 0 15px;
+        color: #092C4C;
+    }
+
+    .ra-paper-card {
+        background: white;
+        border: 1px solid #D8E8F1;
+        border-radius: 17px;
+        padding: 23px;
+        margin-bottom: 16px;
+        box-shadow: 0 7px 22px #092c4c08;
+        transition: .25s;
+    }
+
+    .ra-paper-card:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 13px 30px #092c4c15;
+        border-color: #16B8A6;
+    }
+
+    .ra-paper-top {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 10px;
+        flex-wrap: wrap;
+    }
+
+    .ra-year {
+        background: #DDF5F2;
+        color: #087568;
+        padding: 5px 12px;
+        border-radius: 30px;
+        font-size: 12px;
+        font-weight: bold;
+    }
+
+    .ra-score {
+        color: #087FAD;
+        font-size: 13px;
+        font-weight: bold;
+    }
+
+    .ra-paper-card h3 {
+        color: #092C4C;
+        font-size: 20px;
+        margin: 15px 0 5px;
+        line-height: 1.4;
+    }
+
+    .ra-authors {
+        color: #087FAD;
+        font-size: 13px;
+        font-weight: 600;
+    }
+
+    .ra-abstract {
+        color: #647C91;
+        line-height: 1.7;
+        font-size: 14px;
+        margin: 12px 0 18px;
+    }
+
+    .ra-paper-link {
+        display: inline-block;
+        background: #EAF7FC;
+        color: #087FAD;
+        padding: 10px 16px;
+        border-radius: 9px;
+        font-size: 13px;
+        font-weight: bold;
+    }
+
+    .ra-paper-link:hover {
+        background: #087FAD;
+        color: white;
+        text-decoration: none;
+    }
+
+    .ra-empty {
+        background: white;
+        border: 1px dashed #AFCFD9;
+        border-radius: 17px;
+        padding: 35px 20px;
+        text-align: center;
+        color: #647C91;
+    }
+
+    @media(max-width: 600px) {
+        .ra-welcome {
+            padding: 25px 20px;
+        }
+
+        .ra-search-section {
+            padding: 20px;
+        }
+
+        .ra-search-form {
+            flex-direction: column;
+        }
+
+        .ra-search-form button {
+            width: 100%;
+        }
+
+        .ra-paper-card {
+            padding: 18px;
+        }
+    }
+</style>
+
+<div class="ra-dashboard">
+
+    <section class="ra-welcome">
+        <div class="ra-label">YOUR AI RESEARCH WORKSPACE</div>
+
+        <h1>Welcome to ResearchAI ✨</h1>
+
+        <p>
+            Explore knowledge, discover academic papers
+            and move your research ideas forward.
+        </p>
+    </section>
+
+    <section class="ra-search-section">
+
+        <h2>🔍 Discover Research Papers</h2>
+
+        <p class="muted">
+            Enter a topic, keyword or research interest
+            to discover relevant academic papers.
+        </p>
+
+        <form id="research-search"
+              class="ra-search-form"
+              method="POST"
+              action="{{ url_for('dashboard') }}">
+
+            <input
+                type="text"
+                name="query"
+                value="{{ query }}"
+                placeholder="Example: Artificial Intelligence, Machine Learning..."
+                required
+            >
+
+            <button type="submit">
+                Search Papers →
+            </button>
+
+        </form>
+
+        <div class="ra-topics">
+            <span class="ra-topic">Artificial Intelligence</span>
+            <span class="ra-topic">Machine Learning</span>
+            <span class="ra-topic">Data Science</span>
+            <span class="ra-topic">Cybersecurity</span>
+            <span class="ra-topic">Deep Learning</span>
+        </div>
+
+    </section>
 
     {% if results %}
 
-        <h2>Recommended Research Papers</h2>
+        <h2 class="ra-results-title">
+            📚 Recommended Research Papers
+        </h2>
+
+        <p class="muted">
+            Research papers related to your search.
+        </p>
 
         {% for paper in results %}
 
-            <article class="paper-card"
-                     style="padding:20px; margin:15px 0; background:#f5fbfc; border:1px solid #AFDDE5; border-radius:12px;">
+            <article class="ra-paper-card">
 
-                <div class="paper-top">
-                    <span class="paper-year">{{ paper.year }}</span>
-                    <span class="score">{{ paper.score }}% text similarity</span>
+                <div class="ra-paper-top">
+
+                    <span class="ra-year">
+                        📅 {{ paper.year }}
+                    </span>
+
+                    <span class="ra-score">
+                        {{ paper.score }}% text similarity
+                    </span>
+
                 </div>
 
                 <h3>{{ paper.title }}</h3>
 
-                <p class="authors">{{ paper.authors }}</p>
+                <p class="ra-authors">
+                    ✍ {{ paper.authors }}
+                </p>
 
-                <p>{{ paper.abstract }}</p>
+                <p class="ra-abstract">
+                    {{ paper.abstract }}
+                </p>
 
                 {% if paper.paper_url %}
-                    <a href="{{ paper.paper_url }}"
+
+                    <a class="ra-paper-link"
+                       href="{{ paper.paper_url }}"
                        target="_blank"
                        rel="noopener noreferrer">
-                        Read Research Paper
+                        Read Research Paper ↗
                     </a>
-               {% else %}
-                 <a href="https://scholar.google.com/scholar?q={{ paper.title | urlencode }}"
-                  target="_blank"
-                  rel="noopener noreferrer">
-                   Find Paper on Google Scholar
-                 </a>
+
+                {% else %}
+
+                    <a class="ra-paper-link"
+                       href="https://scholar.google.com/scholar?q={{ paper.title | urlencode }}"
+                       target="_blank"
+                       rel="noopener noreferrer">
+                        Find on Google Scholar ↗
+                    </a>
+
                 {% endif %}
 
             </article>
@@ -71,11 +328,20 @@
 
     {% elif query %}
 
-        <p>No research papers found. Try another topic.</p>
+        <div class="ra-empty">
+            <h2>🔎 No Papers Found</h2>
+            <p>Try another research topic or keyword.</p>
+        </div>
 
     {% else %}
 
-        <p>Enter a topic above and click Search Papers to get recommendations.</p>
+        <div class="ra-empty">
+            <h2>🚀 Start Your Research Journey</h2>
+            <p>
+                Search your favourite research topic
+                to discover recommended academic papers.
+            </p>
+        </div>
 
     {% endif %}
 

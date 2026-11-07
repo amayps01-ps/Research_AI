@@ -189,6 +189,7 @@ def get_db():
 
 def init_db():
     with get_db() as db:
+
         db.execute("""
             CREATE TABLE IF NOT EXISTS users (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -198,6 +199,7 @@ def init_db():
                 created_at TEXT NOT NULL
             )
         """)
+
         db.execute("""
             CREATE TABLE IF NOT EXISTS password_resets (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -207,41 +209,65 @@ def init_db():
                 created_at TEXT NOT NULL
             )
         """)
+
         db.execute("""
             CREATE TABLE IF NOT EXISTS papers (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 title TEXT NOT NULL,
                 authors TEXT NOT NULL,
                 year INTEGER NOT NULL,
-                abstract TEXT NOT NULL
+                abstract TEXT NOT NULL,
+                paper_url TEXT NOT NULL DEFAULT ''
             )
         """)
-        # Add paper URL column if it does not exist
+
+        # Check existing database columns
         columns = [
             row["name"]
-            for row in db.execute("PRAGMA table_info(papers)").fetchall()
+            for row in db.execute(
+                "PRAGMA table_info(papers)"
+            ).fetchall()
         ]
-        count = db.execute("SELECT COUNT(*) FROM papers").fetchone()[0]
+
+        # Add missing paper_url column without deleting old data
+        if "paper_url" not in columns:
+            db.execute("""
+                ALTER TABLE papers
+                ADD COLUMN paper_url TEXT NOT NULL DEFAULT ''
+            """)
+
+        # Restore missing links for existing seed papers
+        for paper in SEED_PAPERS:
+            if paper.get("paper_url"):
+                db.execute("""
+                    UPDATE papers
+                    SET paper_url = ?
+                    WHERE title = ?
+                    AND (paper_url IS NULL OR paper_url = '')
+                """, (paper["paper_url"], paper["title"]))
+
+        # Insert seed papers if database is empty
+        count = db.execute(
+            "SELECT COUNT(*) FROM papers"
+        ).fetchone()[0]
 
         if count == 0:
-            db.executemany(
-                """INSERT INTO papers
+            db.executemany("""
+                INSERT INTO papers
                 (title, authors, year, abstract, paper_url)
-                VALUES (?, ?, ?, ?, ?)""",
-                [
-                    (
-                        p["title"],
-                        p["authors"],
-                        p["year"],
-                        p["abstract"],
-                        p.get("paper_url", "")
-                    )
-                    for p in SEED_PAPERS
-                ]
-            )
+                VALUES (?, ?, ?, ?, ?)
+            """, [
+                (
+                    p["title"],
+                    p["authors"],
+                    p["year"],
+                    p["abstract"],
+                    p.get("paper_url", "")
+                )
+                for p in SEED_PAPERS
+            ])
 
         db.commit()
-
 def login_required(view):
     @wraps(view)
     def wrapped(*args, **kwargs):

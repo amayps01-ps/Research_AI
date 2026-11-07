@@ -1,32 +1,492 @@
 {% extends "base.html" %}
-{% block title %}ResearchAI – Discover Research{% endblock %}
+{% block title %}ResearchAI – Discover. Explore. Innovate.{% endblock %}
+
 {% block content %}
-<section class="hero">
-  <div class="hero-copy">
-    <span class="eyebrow">AI-POWERED ACADEMIC DISCOVERY</span>
-    <h1>Find the research that moves your ideas forward.</h1>
-    <p>Search research topics and discover related academic papers with TF-IDF and cosine similarity.</p>
-    <div class="hero-actions">
-      {% if session.get('user_id') %}
-        <a class="button" href="{{ url_for('dashboard') }}">Explore papers</a>
-      {% else %}
-        <a class="button" href="{{ url_for('register') }}">Get started</a>
-        <a class="button secondary" href="{{ url_for('login') }}">Login</a>
-      {% endif %}
+
+<style>
+.ra-home {
+    --ra-cyan: #afdde5;
+    --ra-blue: #087e91;
+    --ra-dark: #102b46;
+    --ra-text: #263b50;
+    --ra-muted: #65778a;
+    color: var(--ra-text);
+    overflow: hidden;
+}
+
+.ra-home * { box-sizing: border-box; }
+
+.ra-hero {
+    position: relative;
+    padding: 75px 7%;
+    border-radius: 26px;
+    background: linear-gradient(125deg, #102b46, #12566a 65%, #087e91);
+    color: white;
+    overflow: hidden;
+    display: grid;
+    grid-template-columns: 1.2fr .8fr;
+    align-items: center;
+    gap: 35px;
+    min-height: 430px;
+}
+
+.ra-hero:before {
+    content: "";
+    position: absolute;
+    width: 330px;
+    height: 330px;
+    border: 1px solid rgba(255,255,255,.15);
+    border-radius: 50%;
+    right: -80px;
+    top: -100px;
+}
+
+.ra-hero:after {
+    content: "";
+    position: absolute;
+    width: 230px;
+    height: 230px;
+    border: 1px solid rgba(255,255,255,.12);
+    border-radius: 50%;
+    right: 70px;
+    bottom: -160px;
+}
+
+.ra-eyebrow {
+    display: inline-block;
+    color: #b8f0f2;
+    font-size: 12px;
+    font-weight: 800;
+    letter-spacing: 2px;
+    margin-bottom: 18px;
+}
+
+.ra-hero h1 {
+    color: white;
+    font-size: clamp(36px, 5vw, 57px);
+    line-height: 1.12;
+    letter-spacing: -1.8px;
+    margin: 0 0 20px;
+    max-width: 650px;
+}
+
+.ra-hero h1 span { color: #9fe6e9; }
+
+.ra-hero p {
+    color: #d7e9ef;
+    line-height: 1.8;
+    font-size: 16px;
+    max-width: 530px;
+    margin-bottom: 27px;
+}
+
+.ra-actions {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.ra-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 13px 23px;
+    border-radius: 10px;
+    background: #b5edf0;
+    color: #102b46 !important;
+    text-decoration: none !important;
+    font-weight: 750;
+    transition: .25s;
+}
+
+.ra-btn:hover {
+    transform: translateY(-3px);
+    background: white;
+}
+
+.ra-btn-outline {
+    background: transparent;
+    color: white !important;
+    border: 1px solid rgba(255,255,255,.5);
+}
+
+.ra-btn-outline:hover {
+    background: rgba(255,255,255,.12);
+    color: white !important;
+}
+
+.ra-visual {
+    position: relative;
+    min-height: 280px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.ra-orb {
+    width: 210px;
+    height: 210px;
+    border-radius: 50%;
+    background: radial-gradient(circle at 35% 30%, #e4ffff, #80d4df 35%, #15849a 70%);
+    box-shadow: 0 0 75px rgba(151,237,240,.28);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 78px;
+    color: #123d55;
+}
+
+.ra-float {
+    position: absolute;
+    padding: 13px 17px;
+    border: 1px solid rgba(255,255,255,.2);
+    border-radius: 12px;
+    background: rgba(255,255,255,.13);
+    backdrop-filter: blur(12px);
+    color: white;
+    font-size: 13px;
+    font-weight: 650;
+    box-shadow: 0 10px 25px rgba(0,0,0,.12);
+}
+
+.ra-float.one { top: 15px; left: 0; }
+.ra-float.two { bottom: 20px; left: 5px; }
+.ra-float.three { right: 0; top: 115px; }
+
+.ra-section { padding: 65px 2% 15px; }
+
+.ra-heading {
+    text-align: center;
+    max-width: 650px;
+    margin: 0 auto 35px;
+}
+
+.ra-heading small {
+    color: var(--ra-blue);
+    font-weight: 800;
+    letter-spacing: 2px;
+    font-size: 11px;
+}
+
+.ra-heading h2 {
+    color: var(--ra-dark);
+    font-size: clamp(26px, 4vw, 36px);
+    margin: 10px 0;
+    letter-spacing: -.7px;
+}
+
+.ra-heading p {
+    color: var(--ra-muted);
+    line-height: 1.7;
+    margin: 0;
+}
+
+.ra-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+}
+
+.ra-card {
+    background: white;
+    border: 1px solid #e4edf0;
+    padding: 27px 23px;
+    border-radius: 17px;
+    box-shadow: 0 8px 30px rgba(20,60,75,.045);
+    transition: .25s;
+}
+
+.ra-card:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 15px 35px rgba(20,60,75,.10);
+    border-color: #afdde5;
+}
+
+.ra-icon {
+    width: 52px;
+    height: 52px;
+    border-radius: 14px;
+    display: grid;
+    place-items: center;
+    background: #e7f7f8;
+    font-size: 25px;
+    margin-bottom: 18px;
+}
+
+.ra-card h3 {
+    color: var(--ra-dark);
+    font-size: 18px;
+    margin: 0 0 10px;
+}
+
+.ra-card p {
+    color: var(--ra-muted);
+    line-height: 1.7;
+    font-size: 14px;
+    margin: 0;
+}
+
+.ra-topics {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 12px;
+}
+
+.ra-topic {
+    background: #edf8f9;
+    border: 1px solid #d5ecef;
+    padding: 12px 19px;
+    border-radius: 30px;
+    color: #15596a;
+    font-weight: 650;
+    font-size: 14px;
+}
+
+.ra-steps {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+}
+
+.ra-step {
+    text-align: center;
+    padding: 22px 15px;
+}
+
+.ra-number {
+    width: 47px;
+    height: 47px;
+    display: grid;
+    place-items: center;
+    margin: 0 auto 17px;
+    border-radius: 50%;
+    background: #dff4f5;
+    color: #087e91;
+    font-weight: 850;
+    font-size: 19px;
+}
+
+.ra-step h3 {
+    color: var(--ra-dark);
+    font-size: 17px;
+}
+
+.ra-step p {
+    color: var(--ra-muted);
+    line-height: 1.7;
+    font-size: 14px;
+}
+
+.ra-cta {
+    margin: 65px 0 20px;
+    text-align: center;
+    padding: 48px 20px;
+    border-radius: 22px;
+    background: linear-gradient(120deg, #e5f7f8, #f2fbfc);
+    border: 1px solid #d9eff1;
+}
+
+.ra-cta h2 {
+    color: var(--ra-dark);
+    font-size: clamp(25px, 4vw, 34px);
+    margin: 0 0 12px;
+}
+
+.ra-cta p {
+    color: var(--ra-muted);
+    line-height: 1.7;
+    margin-bottom: 24px;
+}
+
+.ra-note {
+    text-align: center;
+    color: var(--ra-muted);
+    font-size: 12px;
+    line-height: 1.7;
+    padding: 20px 10px;
+}
+
+@media(max-width: 760px) {
+    .ra-hero {
+        grid-template-columns: 1fr;
+        padding: 48px 25px;
+        gap: 15px;
+    }
+
+    .ra-visual { min-height: 240px; }
+    .ra-orb { width: 165px; height: 165px; font-size: 60px; }
+    .ra-float { font-size: 11px; padding: 10px 12px; }
+    .ra-grid { grid-template-columns: 1fr; }
+    .ra-steps { grid-template-columns: 1fr; gap: 5px; }
+    .ra-section { padding-top: 48px; }
+}
+
+@media(prefers-reduced-motion: reduce) {
+    .ra-card, .ra-btn { transition: none; }
+}
+</style>
+
+<div class="ra-home">
+
+    <!-- HERO SECTION -->
+    <section class="ra-hero">
+        <div>
+            <span class="ra-eyebrow">✦ AI-POWERED RESEARCH DISCOVERY</span>
+
+            <h1>
+                Discover Knowledge.<br>
+                <span>Explore Innovation.</span>
+            </h1>
+
+            <p>
+                Your journey into research starts here.
+                Explore academic ideas, discover relevant research papers,
+                and find inspiration for your next big discovery.
+            </p>
+
+            <div class="ra-actions">
+                {% if session.get('user_id') %}
+                    <a class="ra-btn" href="{{ url_for('dashboard') }}">
+                        Explore Research →
+                    </a>
+                {% else %}
+                    <a class="ra-btn" href="{{ url_for('register') }}">
+                        Get Started →
+                    </a>
+                    <a class="ra-btn ra-btn-outline" href="{{ url_for('login') }}">
+                        Sign In
+                    </a>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="ra-visual">
+            <div class="ra-orb">✧</div>
+            <div class="ra-float one">📚 Research Papers</div>
+            <div class="ra-float two">✦ Smart Discovery</div>
+            <div class="ra-float three">🤖 AI Powered</div>
+        </div>
+    </section>
+
+    <!-- FEATURES -->
+    <section class="ra-section">
+        <div class="ra-heading">
+            <small>WHY RESEARCHAI?</small>
+            <h2>Everything begins with curiosity</h2>
+            <p>
+                Discover a simpler way to explore academic knowledge
+                and find research related to your interests.
+            </p>
+        </div>
+
+        <div class="ra-grid">
+            <article class="ra-card">
+                <div class="ra-icon">⌕</div>
+                <h3>Intelligent Search</h3>
+                <p>
+                    Enter a research topic or keyword and explore
+                    papers related to your area of interest.
+                </p>
+            </article>
+
+            <article class="ra-card">
+                <div class="ra-icon">✧</div>
+                <h3>Smart Recommendations</h3>
+                <p>
+                    Discover related papers using text-based
+                    similarity and recommendation techniques.
+                </p>
+            </article>
+
+            <article class="ra-card">
+                <div class="ra-icon">▤</div>
+                <h3>Research Workspace</h3>
+                <p>
+                    Explore your research interests in one
+                    simple and organised workspace.
+                </p>
+            </article>
+        </div>
+    </section>
+
+    <!-- RESEARCH AREAS -->
+    <section class="ra-section">
+        <div class="ra-heading">
+            <small>EXPLORE YOUR INTERESTS</small>
+            <h2>Discover different fields of knowledge</h2>
+            <p>
+                Start exploring topics that inspire your curiosity.
+            </p>
+        </div>
+
+        <div class="ra-topics">
+            <span class="ra-topic">🤖 Artificial Intelligence</span>
+            <span class="ra-topic">💻 Computer Science</span>
+            <span class="ra-topic">🧠 Machine Learning</span>
+            <span class="ra-topic">📊 Data Science</span>
+            <span class="ra-topic">🔐 Cybersecurity</span>
+            <span class="ra-topic">🌐 Technology</span>
+        </div>
+    </section>
+
+    <!-- HOW IT WORKS -->
+    <section class="ra-section">
+        <div class="ra-heading">
+            <small>HOW IT WORKS</small>
+            <h2>Three steps to discover research</h2>
+            <p>
+                A simple journey from your research idea
+                to relevant academic papers.
+            </p>
+        </div>
+
+        <div class="ra-steps">
+            <div class="ra-step">
+                <div class="ra-number">01</div>
+                <h3>Create Your Account</h3>
+                <p>Register and enter your research workspace.</p>
+            </div>
+
+            <div class="ra-step">
+                <div class="ra-number">02</div>
+                <h3>Search Your Topic</h3>
+                <p>Enter a keyword or research subject.</p>
+            </div>
+
+            <div class="ra-step">
+                <div class="ra-number">03</div>
+                <h3>Explore Recommendations</h3>
+                <p>Discover related papers and explore new ideas.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- CALL TO ACTION -->
+    <section class="ra-cta">
+        <h2>Your next discovery starts today.</h2>
+        <p>
+            Explore ideas, discover research and take
+            your learning journey further with ResearchAI.
+        </p>
+
+        {% if session.get('user_id') %}
+            <a class="ra-btn" href="{{ url_for('dashboard') }}">
+                Go to Dashboard →
+            </a>
+        {% else %}
+            <a class="ra-btn" href="{{ url_for('register') }}">
+                Join ResearchAI →
+            </a>
+        {% endif %}
+    </section>
+
+    <div class="ra-note">
+        ResearchAI is a research discovery and recommendation project.
+        Please verify paper details and publication information
+        before citing them in academic work.
     </div>
-  </div>
-  <div class="hero-art">
-    <div class="orbit orbit-one"></div><div class="orbit orbit-two"></div>
-    <div class="book-icon">✦</div>
-    <div class="floating-card card-a">Machine Learning</div>
-    <div class="floating-card card-b">Research Discovery</div>
-    <div class="floating-card card-c">AI Recommendations</div>
-  </div>
-</section>
-<section class="features">
-  <article class="feature"><div class="feature-icon">⌕</div><h3>Smart Search</h3><p>Search by topic, keyword, or research interest.</p></article>
-  <article class="feature"><div class="feature-icon">✧</div><h3>Relevant Papers</h3><p>Rank matching papers by text similarity.</p></article>
-  <article class="feature"><div class="feature-icon">▤</div><h3>Simple Workspace</h3><p>Keep your research discovery in one place.</p></article>
-</section>
-<p class="small-note">This starter project includes demonstration paper records. Verify bibliographic details before using them in academic work.</p>
+
+</div>
+
 {% endblock %}
